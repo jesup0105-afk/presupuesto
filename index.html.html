@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Presupuesto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --bg: #0d0d14;
+    --surface: #15151f;
+    --border: #2a2a3d;
+    --accent: #7c6fff;
+    --green: #00e5a0;
+    --red: #ff5572;
+    --yellow: #ffd166;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .subtitle { color: var(--muted); font-size: 0.75rem; margin-bottom: 24px; }
+
+  .income-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .income-label { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .income-amount { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--green); }
+  .income-remaining { text-align: right; }
+  .remaining-label { color: var(--muted); font-size: 0.7rem; }
+  .remaining-amount { font-size: 1.1rem; font-weight: 500; }
+
+  .section-title {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin: 20px 0 10px;
+    padding-left: 4px;
+  }
+
+  .category-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .category-card:hover { border-color: var(--accent); }
+
+  .cat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .cat-name { font-size: 0.85rem; font-weight: 500; }
+  .cat-amounts { font-size: 0.75rem; color: var(--muted); }
+  .cat-amounts span { color: var(--text); }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .remaining-tag {
+    font-size: 0.7rem;
+    margin-top: 6px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* Add expense panel */
+  .add-panel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 20px 16px 32px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    z-index: 100;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .add-panel.open { transform: translateY(0); }
+
+  .panel-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+
+  .field select, .field input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    padding: 10px 12px;
+    outline: none;
+  }
+
+  .field select:focus, .field input:focus { border-color: var(--accent); }
+
+  .btn-add {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 12px;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  .btn-add:hover { opacity: 0.9; }
+
+  .fab {
+    position: fixed;
+    bottom: 28px; right: 20px;
+    width: 52px; height: 52px;
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(124,111,255,0.5);
+    z-index: 99;
+    transition: transform 0.2s;
+  }
+
+  .fab:hover { transform: scale(1.08); }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 90;
+  }
+  .overlay.open { display: block; }
+
+  /* Log */
+  .log-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+  }
+  .log-entry:last-child { border-bottom: none; }
+  .log-cat { color: var(--muted); font-size: 0.7rem; }
+  .log-amount { color: var(--red); font-weight: 500; }
+
+  .log-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .empty-log { color: var(--muted); font-size: 0.75rem; padding: 16px; text-align: center; }
+
+  .clear-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    cursor: pointer;
+    float: right;
+    margin-top: -4px;
+  }
+
+  .savings-box {
+    background: linear-gradient(135deg, rgba(0,229,160,0.1), rgba(124,111,255,0.1));
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .savings-label { color: var(--green); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .savings-amount { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--green); }
+
+  .income-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+  }
+  .income-entry:last-child { border-bottom: none; }
+  .income-entry-source { color: var(--muted); font-size: 0.7rem; }
+  .income-entry-amount { color: var(--green); font-weight: 500; }
+
+  .income-total-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .income-total-label { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .income-total-amount { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+
+  .btn-add-income {
+    background: none;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    cursor: pointer;
+    float: right;
+    margin-top: -4px;
+  }
+</style>
+</head>
+<body>
+
+<h1>💰 Mi Presupuesto</h1>
+<p class="subtitle">Mayo 2026 · Zero-Based</p>
+
+<div class="income-bar">
+  <div>
+    <div class="income-label">Ingreso</div>
+    <div class="income-amount">$4,000</div>
+  </div>
+  <div class="income-remaining">
+    <div class="remaining-label">Sin asignar</div>
+    <div class="remaining-amount" id="unassigned">$0</div>
+  </div>
+</div>
+
+<div id="categories-container"></div>
+
+<div class="savings-box">
+  <div class="savings-label">🏦 Ahorro Proyectado Este Mes</div>
+  <div class="savings-amount" id="savings-display">$1,945</div>
+</div>
+
+<p class="section-title" style="margin-top:24px">Últimos gastos <button class="clear-btn" onclick="clearLog()">Limpiar</button></p>
+<div class="log-box" id="log-box">
+  <div class="empty-log">Ningún gasto registrado aún</div>
+</div>
+
+<p class="section-title" style="margin-top:24px">💵 Ingresos del mes <button class="btn-add-income" onclick="openIncomePanel()">+ Agregar</button></p>
+<div class="income-total-bar">
+  <div class="income-total-label">Total recibido</div>
+  <div class="income-total-amount" id="income-total">$0</div>
+</div>
+<div class="log-box" id="income-log">
+  <div class="empty-log">Ningún ingreso registrado aún</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+<div class="add-panel" id="add-panel">
+  <div class="panel-handle"></div>
+  <div class="panel-title">Agregar Gasto</div>
+  <div class="field">
+    <label>Categoría</label>
+    <select id="cat-select"></select>
+  </div>
+  <div class="field">
+    <label>Monto ($)</label>
+    <input type="number" id="amount-input" placeholder="0.00" min="0" step="0.01">
+  </div>
+  <div class="field">
+    <label>Nota (opcional)</label>
+    <input type="text" id="note-input" placeholder="Ej: Almuerzo con el jefe">
+  </div>
+  <button class="btn-add" onclick="addExpense()">+ Agregar</button>
+</div>
+
+<button class="fab" onclick="openPanel()">+</button>
+
+<div class="overlay" id="income-overlay" onclick="closeIncomePanel()"></div>
+<div class="add-panel" id="income-panel">
+  <div class="panel-handle"></div>
+  <div class="panel-title">Agregar Ingreso</div>
+  <div class="field">
+    <label>Fuente</label>
+    <input type="text" id="income-source-input" placeholder="Ej: Quincena, Freelance, Propinas...">
+  </div>
+  <div class="field">
+    <label>Monto ($)</label>
+    <input type="number" id="income-amount-input" placeholder="0.00" min="0" step="0.01">
+  </div>
+  <div class="field">
+    <label>Nota (opcional)</label>
+    <input type="text" id="income-note-input" placeholder="Ej: Pago semana 1">
+  </div>
+  <button class="btn-add" onclick="addIncome()">+ Agregar Ingreso</button>
+</div>
+
+<script>
+const INCOME = 4000;
+
+const budget = {
+  "🔒 GASTOS FIJOS": [
+    { name: "Casa (renta)", budget: 275 },
+    { name: "Carro + Seguro", budget: 660 },
+    { name: "Reparación de crédito", budget: 150 },
+    { name: "Kikoff", budget: 35 },
+    { name: "Gimnasio", budget: 13 },
+    { name: "Spotify", budget: 15 },
+    { name: "Apple (storage + Claude)", budget: 30 },
+    { name: "PlayStation Plus", budget: 10 },
+  ],
+  "🔄 GASTOS VARIABLES": [
+    { name: "Novia", budget: 330 },
+    { name: "Comida en la calle", budget: 80 },
+    { name: "Familia", budget: 100 },
+    { name: "Tonterías", budget: 50 },
+    { name: "Corte de cabello", budget: 17 },
+    { name: "Gasolina", budget: 120 },
+  ],
+  "💳 DEUDA": [
+    { name: "Tolls", budget: 170 },
+  ]
+};
+
+let expenses = JSON.parse(localStorage.getItem('budget_expenses') || '[]');
+let incomes = JSON.parse(localStorage.getItem('budget_incomes') || '[]');
+
+function save() { localStorage.setItem('budget_expenses', JSON.stringify(expenses)); }
+function saveIncomes() { localStorage.setItem('budget_incomes', JSON.stringify(incomes)); }
+
+function fmt(n) { return '$' + n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+function getSpent(name) {
+  return expenses.filter(e => e.cat === name).reduce((s, e) => s + e.amount, 0);
+}
+
+function pctColor(pct) {
+  if (pct < 0.6) return 'var(--green)';
+  if (pct < 0.85) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function render() {
+  const container = document.getElementById('categories-container');
+  container.innerHTML = '';
+
+  let totalBudget = 0, totalSpent = 0;
+
+  for (const [section, cats] of Object.entries(budget)) {
+    const title = document.createElement('p');
+    title.className = 'section-title';
+    title.textContent = section;
+    container.appendChild(title);
+
+    for (const cat of cats) {
+      totalBudget += cat.budget;
+      const spent = getSpent(cat.name);
+      totalSpent += spent;
+      const remaining = cat.budget - spent;
+      const pct = Math.min(spent / cat.budget, 1);
+      const color = pctColor(pct);
+
+      const card = document.createElement('div');
+      card.className = 'category-card';
+      card.innerHTML = `
+        <div class="cat-top">
+          <span class="cat-name">${cat.name}</span>
+          <span class="cat-amounts">${fmt(spent)} / <span>${fmt(cat.budget)}</span></span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct*100}%;background:${color}"></div>
+        </div>
+        <div class="remaining-tag" style="color:${remaining < 0 ? 'var(--red)' : 'var(--muted)'}">
+          ${remaining >= 0 ? 'Quedan ' + fmt(remaining) : '⚠️ Excedido ' + fmt(Math.abs(remaining))}
+        </div>
+      `;
+      card.onclick = () => { document.getElementById('cat-select').value = cat.name; openPanel(); };
+      container.appendChild(card);
+    }
+  }
+
+  const savingsGoal = 1945;
+  const savingsProjected = INCOME - totalBudget;
+  const savingsActual = INCOME - totalSpent - (totalBudget - totalSpent > 0 ? totalBudget - totalSpent : 0);
+
+  document.getElementById('savings-display').textContent = fmt(savingsProjected);
+  document.getElementById('unassigned').textContent = fmt(INCOME - totalBudget);
+
+  // Log
+  const logBox = document.getElementById('log-box');
+  if (expenses.length === 0) {
+    logBox.innerHTML = '<div class="empty-log">Ningún gasto registrado aún</div>';
+  } else {
+    logBox.innerHTML = [...expenses].reverse().slice(0, 20).map(e => `
+      <div class="log-entry">
+        <div>
+          <div>${e.note || e.cat}</div>
+          <div class="log-cat">${e.cat} · ${e.date}</div>
+        </div>
+        <div class="log-amount">-${fmt(e.amount)}</div>
+      </div>
+    `).join('');
+  }
+  // Income log
+  const incomeLog = document.getElementById('income-log');
+  const totalIncome = incomes.reduce((s, i) => s + i.amount, 0);
+  document.getElementById('income-total').textContent = fmt(totalIncome);
+
+  if (incomes.length === 0) {
+    incomeLog.innerHTML = '<div class="empty-log">Ningún ingreso registrado aún</div>';
+  } else {
+    incomeLog.innerHTML = [...incomes].reverse().map(i => `
+      <div class="income-entry">
+        <div>
+          <div>${i.note || i.source}</div>
+          <div class="income-entry-source">${i.source} · ${i.date}</div>
+        </div>
+        <div class="income-entry-amount">+${fmt(i.amount)}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function openIncomePanel() {
+  document.getElementById('income-panel').classList.add('open');
+  document.getElementById('income-overlay').classList.add('open');
+  document.getElementById('income-amount-input').focus();
+}
+
+function closeIncomePanel() {
+  document.getElementById('income-panel').classList.remove('open');
+  document.getElementById('income-overlay').classList.remove('open');
+}
+
+function addIncome() {
+  const source = document.getElementById('income-source-input').value.trim() || 'Ingreso';
+  const amount = parseFloat(document.getElementById('income-amount-input').value);
+  const note = document.getElementById('income-note-input').value.trim();
+
+  if (!amount || amount <= 0) return;
+
+  incomes.push({ source, amount, note, date: new Date().toLocaleDateString('es-MX') });
+  saveIncomes();
+  render();
+
+  document.getElementById('income-source-input').value = '';
+  document.getElementById('income-amount-input').value = '';
+  document.getElementById('income-note-input').value = '';
+  closeIncomePanel();
+}
+
+function openPanel() {
+  document.getElementById('add-panel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('amount-input').focus();
+}
+
+function closePanel() {
+  document.getElementById('add-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function addExpense() {
+  const cat = document.getElementById('cat-select').value;
+  const amount = parseFloat(document.getElementById('amount-input').value);
+  const note = document.getElementById('note-input').value.trim();
+
+  if (!cat || !amount || amount <= 0) return;
+
+  expenses.push({ cat, amount, note, date: new Date().toLocaleDateString('es-MX') });
+  save();
+  render();
+
+  document.getElementById('amount-input').value = '';
+  document.getElementById('note-input').value = '';
+  closePanel();
+}
+
+function clearLog() {
+  if (confirm('¿Borrar todos los gastos registrados?')) {
+    expenses = [];
+    save();
+    render();
+  }
+}
+
+// Populate select
+const sel = document.getElementById('cat-select');
+for (const [section, cats] of Object.entries(budget)) {
+  const grp = document.createElement('optgroup');
+  grp.label = section;
+  for (const cat of cats) {
+    const opt = document.createElement('option');
+    opt.value = cat.name;
+    opt.textContent = cat.name;
+    grp.appendChild(opt);
+  }
+  sel.appendChild(grp);
+}
+
+render();
+</script>
+</body>
+</html>
