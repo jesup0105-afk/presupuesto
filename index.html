@@ -286,15 +286,15 @@
 <body>
 
 <h1>💰 Mi Presupuesto</h1>
-<p class="subtitle">Mayo 2026 · Zero-Based</p>
+<p class="subtitle">Junio 2026 · Zero-Based</p>
 
 <div class="income-bar">
   <div>
-    <div class="income-label">Ingreso</div>
-    <div class="income-amount">$4,000</div>
+    <div class="income-label">Ingreso Real</div>
+    <div class="income-amount" id="real-income">$0</div>
   </div>
   <div class="income-remaining">
-    <div class="remaining-label">Sin asignar</div>
+    <div class="remaining-label">Disponible</div>
     <div class="remaining-amount" id="unassigned">$0</div>
   </div>
 </div>
@@ -302,8 +302,8 @@
 <div id="categories-container"></div>
 
 <div class="savings-box">
-  <div class="savings-label">🏦 Ahorro Proyectado Este Mes</div>
-  <div class="savings-amount" id="savings-display">$1,945</div>
+  <div class="savings-label">🏦 Ahorro Real Este Mes</div>
+  <div class="savings-amount" id="savings-display">$0</div>
 </div>
 
 <p class="section-title" style="margin-top:24px">Últimos gastos <button class="clear-btn" onclick="clearLog()">Limpiar</button></p>
@@ -362,8 +362,6 @@
 </div>
 
 <script>
-const INCOME = 4000;
-
 const budget = {
   "🔒 GASTOS FIJOS": [
     { name: "Casa (renta)", budget: 275 },
@@ -376,16 +374,14 @@ const budget = {
     { name: "PlayStation Plus", budget: 10 },
   ],
   "🔄 GASTOS VARIABLES": [
-    { name: "Novia", budget: 330 },
-    { name: "Comida en la calle", budget: 80 },
+    { name: "Novia", budget: 400 },
+    { name: "Comida en la calle", budget: 100 },
     { name: "Familia", budget: 100 },
     { name: "Tonterías", budget: 50 },
     { name: "Corte de cabello", budget: 17 },
-    { name: "Gasolina", budget: 120 },
+    { name: "Gasolina", budget: 80 },
+    { name: "Imprevistos", budget: 200 },
   ],
-  "💳 DEUDA": [
-    { name: "Tolls", budget: 170 },
-  ]
 };
 
 let expenses = JSON.parse(localStorage.getItem('budget_expenses') || '[]');
@@ -445,12 +441,10 @@ function render() {
     }
   }
 
-  const savingsGoal = 1945;
-  const savingsProjected = INCOME - totalBudget;
-  const savingsActual = INCOME - totalSpent - (totalBudget - totalSpent > 0 ? totalBudget - totalSpent : 0);
-
-  document.getElementById('savings-display').textContent = fmt(savingsProjected);
-  document.getElementById('unassigned').textContent = fmt(INCOME - totalBudget);
+  const totalIncome = incomes.reduce((s, i) => s + i.amount, 0);
+  document.getElementById('real-income').textContent = fmt(totalIncome);
+  document.getElementById('savings-display').textContent = fmt(Math.max(0, totalIncome - totalSpent));
+  document.getElementById('unassigned').textContent = fmt(Math.max(0, totalIncome - totalSpent));
 
   // Log
   const logBox = document.getElementById('log-box');
@@ -469,7 +463,6 @@ function render() {
   }
   // Income log
   const incomeLog = document.getElementById('income-log');
-  const totalIncome = incomes.reduce((s, i) => s + i.amount, 0);
   document.getElementById('income-total').textContent = fmt(totalIncome);
 
   if (incomes.length === 0) {
