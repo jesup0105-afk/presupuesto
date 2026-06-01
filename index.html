@@ -255,6 +255,16 @@
   .income-entry:last-child { border-bottom: none; }
   .income-entry-source { color: var(--muted); font-size: 0.7rem; }
   .income-entry-amount { color: var(--green); font-weight: 500; }
+  .income-entry-delete {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0 0 0 10px;
+    line-height: 1;
+  }
+  .income-entry-delete:hover { color: var(--red); }
 
   .income-total-bar {
     background: var(--surface);
@@ -468,13 +478,17 @@ function render() {
   if (incomes.length === 0) {
     incomeLog.innerHTML = '<div class="empty-log">Ningún ingreso registrado aún</div>';
   } else {
-    incomeLog.innerHTML = [...incomes].reverse().map(i => `
+    const reversedIncomes = [...incomes].map((i, idx) => ({ ...i, origIdx: idx })).reverse();
+    incomeLog.innerHTML = reversedIncomes.map(i => `
       <div class="income-entry">
         <div>
           <div>${i.note || i.source}</div>
           <div class="income-entry-source">${i.source} · ${i.date}</div>
         </div>
-        <div class="income-entry-amount">+${fmt(i.amount)}</div>
+        <div style="display:flex;align-items:center">
+          <div class="income-entry-amount">+${fmt(i.amount)}</div>
+          <button class="income-entry-delete" onclick="deleteIncome(${i.origIdx})">✕</button>
+        </div>
       </div>
     `).join('');
   }
@@ -541,6 +555,12 @@ function clearLog() {
     save();
     render();
   }
+}
+
+function deleteIncome(idx) {
+  incomes.splice(idx, 1);
+  saveIncomes();
+  render();
 }
 
 // Populate select
