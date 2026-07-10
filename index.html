@@ -26,7 +26,7 @@
     color: var(--text);
     font-family: 'DM Mono', monospace;
     min-height: 100vh;
-    padding: 24px 16px;
+    padding: 24px 16px 96px;
   }
 
   h1 {
@@ -37,7 +37,29 @@
     margin-bottom: 4px;
   }
 
-  .subtitle { color: var(--muted); font-size: 0.75rem; margin-bottom: 24px; }
+  .subtitle { color: var(--muted); font-size: 0.75rem; margin-bottom: 20px; }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .tab {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
 
   .income-bar {
     background: var(--surface);
@@ -74,7 +96,6 @@
     cursor: pointer;
     transition: border-color 0.2s;
   }
-
   .category-card:hover { border-color: var(--accent); }
 
   .cat-top {
@@ -83,10 +104,16 @@
     align-items: center;
     margin-bottom: 8px;
   }
-
   .cat-name { font-size: 0.85rem; font-weight: 500; }
   .cat-amounts { font-size: 0.75rem; color: var(--muted); }
   .cat-amounts span { color: var(--text); }
+
+  .counter-amount {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--accent) !important;
+  }
 
   .progress-bar {
     height: 4px;
@@ -94,12 +121,7 @@
     border-radius: 2px;
     overflow: hidden;
   }
-
-  .progress-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.4s ease;
-  }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
 
   .remaining-tag {
     font-size: 0.7rem;
@@ -108,7 +130,7 @@
     justify-content: flex-end;
   }
 
-  /* Add expense panel */
+  /* Panels */
   .add-panel {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -120,7 +142,6 @@
     z-index: 100;
     border-radius: 20px 20px 0 0;
   }
-
   .add-panel.open { transform: translateY(0); }
 
   .panel-handle {
@@ -129,7 +150,6 @@
     border-radius: 2px;
     margin: 0 auto 16px;
   }
-
   .panel-title {
     font-family: 'Syne', sans-serif;
     font-size: 1rem;
@@ -139,7 +159,6 @@
 
   .field { margin-bottom: 14px; }
   .field label { display: block; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-
   .field select, .field input {
     width: 100%;
     background: var(--bg);
@@ -151,7 +170,6 @@
     padding: 10px 12px;
     outline: none;
   }
-
   .field select:focus, .field input:focus { border-color: var(--accent); }
 
   .btn-add {
@@ -167,7 +185,6 @@
     cursor: pointer;
     margin-top: 4px;
   }
-
   .btn-add:hover { opacity: 0.9; }
 
   .fab {
@@ -184,7 +201,6 @@
     z-index: 99;
     transition: transform 0.2s;
   }
-
   .fab:hover { transform: scale(1.08); }
 
   .overlay {
@@ -196,8 +212,8 @@
   }
   .overlay.open { display: block; }
 
-  /* Log */
-  .log-entry {
+  /* Logs */
+  .log-entry, .income-entry {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -205,22 +221,22 @@
     border-bottom: 1px solid var(--border);
     font-size: 0.8rem;
   }
-  .log-entry:last-child { border-bottom: none; }
-  .log-cat { color: var(--muted); font-size: 0.7rem; }
+  .log-entry:last-child, .income-entry:last-child { border-bottom: none; }
+  .log-cat, .income-entry-source { color: var(--muted); font-size: 0.7rem; }
   .log-amount { color: var(--red); font-weight: 500; }
+  .income-entry-amount { color: var(--green); font-weight: 500; }
 
   .log-box {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     margin-top: 8px;
-    max-height: 200px;
+    max-height: 240px;
     overflow-y: auto;
   }
+  .empty-log { color: var(--muted); font-size: 0.75rem; padding: 20px; text-align: center; }
 
-  .empty-log { color: var(--muted); font-size: 0.75rem; padding: 16px; text-align: center; }
-
-  .clear-btn {
+  .clear-btn, .btn-add-income {
     background: none;
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -232,39 +248,7 @@
     float: right;
     margin-top: -4px;
   }
-
-  .savings-box {
-    background: linear-gradient(135deg, rgba(0,229,160,0.1), rgba(124,111,255,0.1));
-    border: 1px solid var(--green);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-top: 20px;
-    text-align: center;
-  }
-  .savings-label { color: var(--green); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; }
-  .savings-amount { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--green); }
-
-  .income-entry {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.8rem;
-  }
-  .income-entry:last-child { border-bottom: none; }
-  .income-entry-source { color: var(--muted); font-size: 0.7rem; }
-  .income-entry-amount { color: var(--green); font-weight: 500; }
-  .income-entry-delete {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 0 0 0 10px;
-    line-height: 1;
-  }
-  .income-entry-delete:hover { color: var(--red); }
+  .btn-add-income { border-color: var(--accent); color: var(--accent); }
 
   .income-total-bar {
     background: var(--surface);
@@ -279,59 +263,130 @@
   .income-total-label { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
   .income-total-amount { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--accent); }
 
-  .btn-add-income {
-    background: none;
-    border: 1px solid var(--accent);
-    border-radius: 6px;
-    color: var(--accent);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    padding: 4px 10px;
-    cursor: pointer;
-    float: right;
-    margin-top: -4px;
+  .savings-box {
+    background: linear-gradient(135deg, rgba(0,229,160,0.1), rgba(124,111,255,0.1));
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    text-align: center;
   }
+  .savings-label { color: var(--green); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .savings-amount { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--green); }
+
+  /* Charts */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 16px;
+    margin-bottom: 12px;
+  }
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .chart-sub { color: var(--muted); font-size: 0.68rem; margin-bottom: 14px; }
+  .chart-card svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .c-label { font-family: 'DM Mono', monospace; font-size: 8px; fill: var(--muted); }
+  .c-value { font-family: 'DM Mono', monospace; font-size: 8px; fill: var(--text); }
+
+  .legend { display: flex; gap: 16px; margin-top: 12px; justify-content: center; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.78rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--muted); }
+  .stat-val { font-weight: 500; }
 </style>
 </head>
 <body>
 
 <h1>💰 Mi Presupuesto</h1>
-<p class="subtitle">Junio 2026 · Zero-Based</p>
+<p class="subtitle">Julio 2026 · Zero-Based</p>
 
-<div class="income-bar">
-  <div>
-    <div class="income-label">Ingreso Real</div>
-    <div class="income-amount" id="real-income">$0</div>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('mes', this)">Este mes</button>
+  <button class="tab" onclick="switchTab('graficas', this)">Gráficas</button>
+</div>
+
+<!-- ============ TAB: ESTE MES ============ -->
+<div class="tab-panel active" id="tab-mes">
+
+  <div class="income-bar">
+    <div>
+      <div class="income-label">Ingreso Real</div>
+      <div class="income-amount" id="real-income">$0</div>
+    </div>
+    <div class="income-remaining">
+      <div class="remaining-label">Disponible</div>
+      <div class="remaining-amount" id="unassigned">$0</div>
+    </div>
   </div>
-  <div class="income-remaining">
-    <div class="remaining-label">Disponible</div>
-    <div class="remaining-amount" id="unassigned">$0</div>
+
+  <div id="categories-container"></div>
+
+  <div class="savings-box">
+    <div class="savings-label">🏦 Ahorro Real Este Mes</div>
+    <div class="savings-amount" id="savings-display">$0</div>
   </div>
+
+  <p class="section-title" style="margin-top:24px">Últimos gastos <button class="clear-btn" onclick="clearLog()">Limpiar</button></p>
+  <div class="log-box" id="log-box">
+    <div class="empty-log">Ningún gasto registrado aún</div>
+  </div>
+
+  <p class="section-title" style="margin-top:24px">💵 Ingresos del mes <button class="btn-add-income" onclick="openIncomePanel()">+ Agregar</button></p>
+  <div class="income-total-bar">
+    <div class="income-total-label">Total recibido</div>
+    <div class="income-total-amount" id="income-total">$0</div>
+  </div>
+  <div class="log-box" id="income-log">
+    <div class="empty-log">Ningún ingreso registrado aún</div>
+  </div>
+
 </div>
 
-<div id="categories-container"></div>
+<!-- ============ TAB: GRÁFICAS ============ -->
+<div class="tab-panel" id="tab-graficas">
 
-<div class="savings-box">
-  <div class="savings-label">🏦 Ahorro Real Este Mes</div>
-  <div class="savings-amount" id="savings-display">$0</div>
+  <div class="chart-card">
+    <div class="chart-title">Gasto por categoría</div>
+    <div class="chart-sub">Dónde se va el dinero este mes</div>
+    <div id="chart-categorias"></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Gasto acumulado</div>
+    <div class="chart-sub">Tu ritmo vs. el presupuesto del mes</div>
+    <div id="chart-acumulado"></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Gasolina vs Uber</div>
+    <div class="chart-sub">El costo real de estar sin carro</div>
+    <div id="chart-transporte"></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Resumen</div>
+    <div class="chart-sub">Números clave del mes</div>
+    <div id="stats-resumen"></div>
+  </div>
+
 </div>
 
-<p class="section-title" style="margin-top:24px">Últimos gastos <button class="clear-btn" onclick="clearLog()">Limpiar</button></p>
-<div class="log-box" id="log-box">
-  <div class="empty-log">Ningún gasto registrado aún</div>
-</div>
-
-<p class="section-title" style="margin-top:24px">💵 Ingresos del mes <button class="btn-add-income" onclick="openIncomePanel()">+ Agregar</button></p>
-<div class="income-total-bar">
-  <div class="income-total-label">Total recibido</div>
-  <div class="income-total-amount" id="income-total">$0</div>
-</div>
-<div class="log-box" id="income-log">
-  <div class="empty-log">Ningún ingreso registrado aún</div>
-</div>
-
+<!-- Panels -->
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
-
 <div class="add-panel" id="add-panel">
   <div class="panel-handle"></div>
   <div class="panel-title">Agregar Gasto</div>
@@ -350,15 +405,13 @@
   <button class="btn-add" onclick="addExpense()">+ Agregar</button>
 </div>
 
-<button class="fab" onclick="openPanel()">+</button>
-
 <div class="overlay" id="income-overlay" onclick="closeIncomePanel()"></div>
 <div class="add-panel" id="income-panel">
   <div class="panel-handle"></div>
   <div class="panel-title">Agregar Ingreso</div>
   <div class="field">
     <label>Fuente</label>
-    <input type="text" id="income-source-input" placeholder="Ej: Quincena, Freelance, Propinas...">
+    <input type="text" id="income-source-input" placeholder="Ej: Quincena, Bono...">
   </div>
   <div class="field">
     <label>Monto ($)</label>
@@ -366,10 +419,12 @@
   </div>
   <div class="field">
     <label>Nota (opcional)</label>
-    <input type="text" id="income-note-input" placeholder="Ej: Pago semana 1">
+    <input type="text" id="income-note-input" placeholder="Ej: Pago quincena 1">
   </div>
   <button class="btn-add" onclick="addIncome()">+ Agregar Ingreso</button>
 </div>
+
+<button class="fab" onclick="openPanel()">+</button>
 
 <script>
 const budget = {
@@ -384,39 +439,51 @@ const budget = {
     { name: "PlayStation Plus", budget: 10 },
   ],
   "🔄 GASTOS VARIABLES": [
-    { name: "Novia", budget: 400 },
-    { name: "Comida en la calle", budget: 100 },
+    { name: "Novia", budget: 300 },
+    { name: "Comida en la calle", budget: 80 },
     { name: "Familia", budget: 100 },
-    { name: "Tonterías", budget: 50 },
-    { name: "Corte de cabello", budget: 17 },
-    { name: "Gasolina", budget: 80 },
-    { name: "Imprevistos", budget: 200 },
+    { name: "Tonterías", budget: 80 },
+    { name: "Imprevistos", budget: 150 },
+  ],
+  "🚗 TRANSPORTE (sin límite)": [
+    { name: "Gasolina", unlimited: true },
+    { name: "Uber", unlimited: true },
+  ],
+  "⚡ GASTOS ÚNICOS": [
+    { name: "Mecánico", budget: 600 },
+    { name: "Viaje familiar", budget: 400 },
   ],
 };
 
 let expenses = JSON.parse(localStorage.getItem('budget_expenses') || '[]');
-let incomes = JSON.parse(localStorage.getItem('budget_incomes') || '[]');
+let incomes  = JSON.parse(localStorage.getItem('budget_incomes')  || '[]');
 
-function save() { localStorage.setItem('budget_expenses', JSON.stringify(expenses)); }
-function saveIncomes() { localStorage.setItem('budget_incomes', JSON.stringify(incomes)); }
+function save()        { localStorage.setItem('budget_expenses', JSON.stringify(expenses)); }
+function saveIncomes() { localStorage.setItem('budget_incomes',  JSON.stringify(incomes));  }
 
-function fmt(n) { return '$' + n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+function getSpent(name) { return expenses.filter(e => e.cat === name).reduce((s, e) => s + e.amount, 0); }
+function pctColor(p) { return p < 0.6 ? 'var(--green)' : p < 0.85 ? 'var(--yellow)' : 'var(--red)'; }
 
-function getSpent(name) {
-  return expenses.filter(e => e.cat === name).reduce((s, e) => s + e.amount, 0);
+// Parse "d/m/yyyy" (es-MX) into day-of-month
+function dayOf(dateStr) {
+  const p = String(dateStr).split('/');
+  return p.length === 3 ? parseInt(p[0], 10) : 1;
 }
 
-function pctColor(pct) {
-  if (pct < 0.6) return 'var(--green)';
-  if (pct < 0.85) return 'var(--yellow)';
-  return 'var(--red)';
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'graficas') renderCharts();
 }
 
+/* ---------------- MAIN RENDER ---------------- */
 function render() {
   const container = document.getElementById('categories-container');
   container.innerHTML = '';
-
-  let totalBudget = 0, totalSpent = 0;
+  let totalSpent = 0;
 
   for (const [section, cats] of Object.entries(budget)) {
     const title = document.createElement('p');
@@ -425,145 +492,262 @@ function render() {
     container.appendChild(title);
 
     for (const cat of cats) {
-      totalBudget += cat.budget;
       const spent = getSpent(cat.name);
       totalSpent += spent;
-      const remaining = cat.budget - spent;
-      const pct = Math.min(spent / cat.budget, 1);
-      const color = pctColor(pct);
 
       const card = document.createElement('div');
       card.className = 'category-card';
-      card.innerHTML = `
-        <div class="cat-top">
-          <span class="cat-name">${cat.name}</span>
-          <span class="cat-amounts">${fmt(spent)} / <span>${fmt(cat.budget)}</span></span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width:${pct*100}%;background:${color}"></div>
-        </div>
-        <div class="remaining-tag" style="color:${remaining < 0 ? 'var(--red)' : 'var(--muted)'}">
-          ${remaining >= 0 ? 'Quedan ' + fmt(remaining) : '⚠️ Excedido ' + fmt(Math.abs(remaining))}
-        </div>
-      `;
+
+      if (cat.unlimited) {
+        card.innerHTML = `
+          <div class="cat-top">
+            <span class="cat-name">${cat.name}</span>
+            <span class="cat-amounts counter-amount">${fmt(spent)}</span>
+          </div>
+          <div class="remaining-tag" style="color:var(--muted)">Acumulado del mes</div>`;
+      } else {
+        const remaining = cat.budget - spent;
+        const pct = Math.min(spent / cat.budget, 1);
+        card.innerHTML = `
+          <div class="cat-top">
+            <span class="cat-name">${cat.name}</span>
+            <span class="cat-amounts">${fmt(spent)} / <span>${fmt(cat.budget)}</span></span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct*100}%;background:${pctColor(pct)}"></div>
+          </div>
+          <div class="remaining-tag" style="color:${remaining < 0 ? 'var(--red)' : 'var(--muted)'}">
+            ${remaining >= 0 ? 'Quedan ' + fmt(remaining) : '⚠️ Excedido ' + fmt(Math.abs(remaining))}
+          </div>`;
+      }
       card.onclick = () => { document.getElementById('cat-select').value = cat.name; openPanel(); };
       container.appendChild(card);
     }
   }
 
   const totalIncome = incomes.reduce((s, i) => s + i.amount, 0);
-  document.getElementById('real-income').textContent = fmt(totalIncome);
+  document.getElementById('real-income').textContent   = fmt(totalIncome);
   document.getElementById('savings-display').textContent = fmt(Math.max(0, totalIncome - totalSpent));
-  document.getElementById('unassigned').textContent = fmt(Math.max(0, totalIncome - totalSpent));
+  document.getElementById('unassigned').textContent    = fmt(Math.max(0, totalIncome - totalSpent));
+  document.getElementById('income-total').textContent  = fmt(totalIncome);
 
-  // Log
   const logBox = document.getElementById('log-box');
-  if (expenses.length === 0) {
-    logBox.innerHTML = '<div class="empty-log">Ningún gasto registrado aún</div>';
-  } else {
-    logBox.innerHTML = [...expenses].reverse().slice(0, 20).map(e => `
-      <div class="log-entry">
-        <div>
-          <div>${e.note || e.cat}</div>
-          <div class="log-cat">${e.cat} · ${e.date}</div>
-        </div>
-        <div class="log-amount">-${fmt(e.amount)}</div>
-      </div>
-    `).join('');
-  }
-  // Income log
-  const incomeLog = document.getElementById('income-log');
-  document.getElementById('income-total').textContent = fmt(totalIncome);
+  logBox.innerHTML = expenses.length === 0
+    ? '<div class="empty-log">Ningún gasto registrado aún</div>'
+    : [...expenses].reverse().slice(0, 25).map(e => `
+        <div class="log-entry">
+          <div><div>${e.note || e.cat}</div><div class="log-cat">${e.cat} · ${e.date}</div></div>
+          <div class="log-amount">-${fmt(e.amount)}</div>
+        </div>`).join('');
 
-  if (incomes.length === 0) {
-    incomeLog.innerHTML = '<div class="empty-log">Ningún ingreso registrado aún</div>';
-  } else {
-    const reversedIncomes = [...incomes].map((i, idx) => ({ ...i, origIdx: idx })).reverse();
-    incomeLog.innerHTML = reversedIncomes.map(i => `
-      <div class="income-entry">
-        <div>
-          <div>${i.note || i.source}</div>
-          <div class="income-entry-source">${i.source} · ${i.date}</div>
-        </div>
-        <div style="display:flex;align-items:center">
+  const incomeLog = document.getElementById('income-log');
+  incomeLog.innerHTML = incomes.length === 0
+    ? '<div class="empty-log">Ningún ingreso registrado aún</div>'
+    : [...incomes].reverse().map(i => `
+        <div class="income-entry">
+          <div><div>${i.note || i.source}</div><div class="income-entry-source">${i.source} · ${i.date}</div></div>
           <div class="income-entry-amount">+${fmt(i.amount)}</div>
-          <button class="income-entry-delete" onclick="deleteIncome(${i.origIdx})">✕</button>
-        </div>
-      </div>
-    `).join('');
-  }
+        </div>`).join('');
+
+  if (document.getElementById('tab-graficas').classList.contains('active')) renderCharts();
 }
 
+/* ---------------- CHARTS ---------------- */
+function renderCharts() {
+  chartCategorias();
+  chartAcumulado();
+  chartTransporte();
+  statsResumen();
+}
+
+// 1. Horizontal bars: spend per category
+function chartCategorias() {
+  const box = document.getElementById('chart-categorias');
+  const rows = [];
+  for (const cats of Object.values(budget))
+    for (const c of cats) {
+      const s = getSpent(c.name);
+      if (s > 0) rows.push({ name: c.name, spent: s, budget: c.budget || null });
+    }
+  rows.sort((a, b) => b.spent - a.spent);
+
+  if (!rows.length) { box.innerHTML = '<div class="empty-log">Sin gastos aún</div>'; return; }
+
+  const max = Math.max(...rows.map(r => r.spent));
+  const barH = 22, gap = 12, labelW = 4, W = 320;
+  const H = rows.length * (barH + gap);
+
+  const bars = rows.map((r, i) => {
+    const y = i * (barH + gap);
+    const w = Math.max((r.spent / max) * (W - 70), 2);
+    const over = r.budget && r.spent > r.budget;
+    const color = over ? 'var(--red)' : 'var(--accent)';
+    return `
+      <text class="c-label" x="${labelW}" y="${y + 8}">${r.name}</text>
+      <rect x="${labelW}" y="${y + 12}" width="${w}" height="9" rx="2" fill="${color}"/>
+      <text class="c-value" x="${labelW + w + 6}" y="${y + 20}">${fmt(r.spent)}</text>`;
+  }).join('');
+
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${bars}</svg>`;
+}
+
+// 2. Cumulative spend line vs budget reference
+function chartAcumulado() {
+  const box = document.getElementById('chart-acumulado');
+  if (!expenses.length) { box.innerHTML = '<div class="empty-log">Sin gastos aún</div>'; return; }
+
+  const daysInMonth = 31;
+  const perDay = new Array(daysInMonth + 1).fill(0);
+  expenses.forEach(e => { const d = Math.min(Math.max(dayOf(e.date), 1), daysInMonth); perDay[d] += e.amount; });
+
+  const cum = []; let run = 0;
+  for (let d = 1; d <= daysInMonth; d++) { run += perDay[d]; cum.push(run); }
+
+  let totalBudget = 0;
+  for (const cats of Object.values(budget)) for (const c of cats) if (c.budget) totalBudget += c.budget;
+
+  const W = 320, H = 150, padL = 38, padB = 20, padT = 8;
+  const maxV = Math.max(totalBudget, run) * 1.05;
+  const x = d => padL + ((d - 1) / (daysInMonth - 1)) * (W - padL - 10);
+  const y = v => H - padB - (v / maxV) * (H - padB - padT);
+
+  const pts = cum.map((v, i) => `${x(i + 1)},${y(v)}`).join(' ');
+  const budgetY = y(totalBudget);
+
+  const gridLabels = [0, maxV / 2, maxV].map(v =>
+    `<text class="c-label" x="2" y="${y(v) + 3}">${fmt(v)}</text>
+     <line x1="${padL}" y1="${y(v)}" x2="${W - 10}" y2="${y(v)}" stroke="var(--border)" stroke-width="0.5"/>`).join('');
+
+  const dayLabels = [1, 8, 15, 22, 31].map(d =>
+    `<text class="c-label" x="${x(d)}" y="${H - 6}" text-anchor="middle">${d}</text>`).join('');
+
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}">
+    ${gridLabels}
+    <line x1="${padL}" y1="${budgetY}" x2="${W - 10}" y2="${budgetY}" stroke="var(--yellow)" stroke-width="1" stroke-dasharray="4 3"/>
+    <text class="c-label" x="${W - 12}" y="${budgetY - 4}" text-anchor="end" fill="var(--yellow)">Presupuesto ${fmt(totalBudget)}</text>
+    <polyline points="${pts}" fill="none" stroke="var(--green)" stroke-width="2"/>
+    ${dayLabels}
+  </svg>`;
+}
+
+// 3. Gasolina vs Uber cumulative lines
+function chartTransporte() {
+  const box = document.getElementById('chart-transporte');
+  const gas = expenses.filter(e => e.cat === 'Gasolina');
+  const ube = expenses.filter(e => e.cat === 'Uber');
+  if (!gas.length && !ube.length) { box.innerHTML = '<div class="empty-log">Sin gastos de transporte aún</div>'; return; }
+
+  const days = 31;
+  const cumFor = list => {
+    const per = new Array(days + 1).fill(0);
+    list.forEach(e => { const d = Math.min(Math.max(dayOf(e.date), 1), days); per[d] += e.amount; });
+    const out = []; let run = 0;
+    for (let d = 1; d <= days; d++) { run += per[d]; out.push(run); }
+    return out;
+  };
+  const cg = cumFor(gas), cu = cumFor(ube);
+  const maxV = Math.max(...cg, ...cu, 1) * 1.15;
+
+  const W = 320, H = 150, padL = 38, padB = 20, padT = 8;
+  const x = d => padL + ((d - 1) / (days - 1)) * (W - padL - 10);
+  const y = v => H - padB - (v / maxV) * (H - padB - padT);
+
+  const line = (arr, color) => `<polyline points="${arr.map((v,i)=>`${x(i+1)},${y(v)}`).join(' ')}" fill="none" stroke="${color}" stroke-width="2"/>`;
+  const grid = [0, maxV/2, maxV].map(v =>
+    `<text class="c-label" x="2" y="${y(v)+3}">${fmt(v)}</text>
+     <line x1="${padL}" y1="${y(v)}" x2="${W-10}" y2="${y(v)}" stroke="var(--border)" stroke-width="0.5"/>`).join('');
+  const dayLabels = [1, 8, 15, 22, 31].map(d =>
+    `<text class="c-label" x="${x(d)}" y="${H-6}" text-anchor="middle">${d}</text>`).join('');
+
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}">
+    ${grid}
+    ${line(cu, 'var(--red)')}
+    ${line(cg, 'var(--green)')}
+    ${dayLabels}
+  </svg>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Gasolina ${fmt(cg[days-1])}</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Uber ${fmt(cu[days-1])}</div>
+  </div>`;
+}
+
+// 4. Key stats
+function statsResumen() {
+  const box = document.getElementById('stats-resumen');
+  const totalIncome = incomes.reduce((s, i) => s + i.amount, 0);
+  const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
+  const saved = totalIncome - totalSpent;
+  const rate = totalIncome > 0 ? (saved / totalIncome) * 100 : 0;
+
+  const transporte = getSpent('Gasolina') + getSpent('Uber');
+  const unicos = getSpent('Mecánico') + getSpent('Viaje familiar');
+  const recurrente = totalSpent - unicos;
+
+  const today = new Date().getDate();
+  const ritmo = today > 0 ? (totalSpent / today) * 31 : 0;
+
+  const rows = [
+    ['Ingreso del mes', fmt(totalIncome), 'var(--green)'],
+    ['Gasto total', fmt(totalSpent), 'var(--text)'],
+    ['— recurrente', fmt(recurrente), 'var(--muted)'],
+    ['— gastos únicos', fmt(unicos), 'var(--muted)'],
+    ['Transporte (gas + uber)', fmt(transporte), 'var(--accent)'],
+    ['Ahorro', fmt(saved), saved >= 0 ? 'var(--green)' : 'var(--red)'],
+    ['Tasa de ahorro', rate.toFixed(0) + '%', rate >= 30 ? 'var(--green)' : 'var(--yellow)'],
+    ['Proyección fin de mes', fmt(ritmo), 'var(--yellow)'],
+  ];
+
+  box.innerHTML = rows.map(([l, v, c]) =>
+    `<div class="stat-row"><span class="stat-label">${l}</span><span class="stat-val" style="color:${c}">${v}</span></div>`).join('');
+}
+
+/* ---------------- ACTIONS ---------------- */
+function openPanel() {
+  document.getElementById('add-panel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('amount-input').focus();
+}
+function closePanel() {
+  document.getElementById('add-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function addExpense() {
+  const cat = document.getElementById('cat-select').value;
+  const amount = parseFloat(document.getElementById('amount-input').value);
+  const note = document.getElementById('note-input').value.trim();
+  if (!cat || !amount || amount <= 0) return;
+  expenses.push({ cat, amount, note, date: new Date().toLocaleDateString('es-MX') });
+  save(); render();
+  document.getElementById('amount-input').value = '';
+  document.getElementById('note-input').value = '';
+  closePanel();
+}
+function clearLog() {
+  if (confirm('¿Borrar todos los gastos registrados?')) { expenses = []; save(); render(); }
+}
 function openIncomePanel() {
   document.getElementById('income-panel').classList.add('open');
   document.getElementById('income-overlay').classList.add('open');
   document.getElementById('income-amount-input').focus();
 }
-
 function closeIncomePanel() {
   document.getElementById('income-panel').classList.remove('open');
   document.getElementById('income-overlay').classList.remove('open');
 }
-
 function addIncome() {
   const source = document.getElementById('income-source-input').value.trim() || 'Ingreso';
   const amount = parseFloat(document.getElementById('income-amount-input').value);
   const note = document.getElementById('income-note-input').value.trim();
-
   if (!amount || amount <= 0) return;
-
   incomes.push({ source, amount, note, date: new Date().toLocaleDateString('es-MX') });
-  saveIncomes();
-  render();
-
+  saveIncomes(); render();
   document.getElementById('income-source-input').value = '';
   document.getElementById('income-amount-input').value = '';
   document.getElementById('income-note-input').value = '';
   closeIncomePanel();
 }
 
-function openPanel() {
-  document.getElementById('add-panel').classList.add('open');
-  document.getElementById('overlay').classList.add('open');
-  document.getElementById('amount-input').focus();
-}
-
-function closePanel() {
-  document.getElementById('add-panel').classList.remove('open');
-  document.getElementById('overlay').classList.remove('open');
-}
-
-function addExpense() {
-  const cat = document.getElementById('cat-select').value;
-  const amount = parseFloat(document.getElementById('amount-input').value);
-  const note = document.getElementById('note-input').value.trim();
-
-  if (!cat || !amount || amount <= 0) return;
-
-  expenses.push({ cat, amount, note, date: new Date().toLocaleDateString('es-MX') });
-  save();
-  render();
-
-  document.getElementById('amount-input').value = '';
-  document.getElementById('note-input').value = '';
-  closePanel();
-}
-
-function clearLog() {
-  if (confirm('¿Borrar todos los gastos registrados?')) {
-    expenses = [];
-    save();
-    render();
-  }
-}
-
-function deleteIncome(idx) {
-  incomes.splice(idx, 1);
-  saveIncomes();
-  render();
-}
-
-// Populate select
+/* ---------------- INIT ---------------- */
 const sel = document.getElementById('cat-select');
 for (const [section, cats] of Object.entries(budget)) {
   const grp = document.createElement('optgroup');
@@ -576,7 +760,6 @@ for (const [section, cats] of Object.entries(budget)) {
   }
   sel.appendChild(grp);
 }
-
 render();
 </script>
 </body>
